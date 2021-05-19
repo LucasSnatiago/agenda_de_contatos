@@ -1,10 +1,25 @@
+import 'package:agenda_de_contatos/providers/contatos.dart';
+import 'package:agenda_de_contatos/telas/novo_contato.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'telas/inicio.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp();
+    return MultiProvider(
+        providers: [ChangeNotifierProvider.value(value: Contatos())],
+        child: MaterialApp(
+          title: 'Agenda de Contatos',
+          home: Inicio(),
+          theme: ThemeData.dark(),
+          routes: {
+            Inicio.routeName: (ctx) => Inicio(),
+            NovoContato.routeName: (ctx) => NovoContato(),
+          },
+        ));
   }
 }
