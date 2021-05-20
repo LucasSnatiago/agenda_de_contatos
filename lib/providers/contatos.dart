@@ -3,15 +3,26 @@ import 'package:flutter/foundation.dart';
 
 class Contatos with ChangeNotifier {
   List<Contato> _contatos = [];
+  int id;
 
-  List<Contato> get itens => [...this._contatos];
+  Contatos() {
+    this.id = 0;
+  }
+
+  List<Contato> get itens {
+    this.id = this._contatos.length;
+    return [...this._contatos];
+  }
+
   Contato encontrarID(String t) =>
       this._contatos.firstWhere((element) => element.telefone == t);
 
   inserir(
       String nome, String email, String endereco, String cep, String telefone) {
     // Adicionando novo elemento na lista do provider
-    this._contatos.add(Contato(nome, email, endereco, cep, telefone));
+    Contato tmp = Contato(nome, email, endereco, cep, telefone);
+    tmp.id = ++this.id;
+    this._contatos.add(tmp);
     // Alertando para nova inserção
     notifyListeners();
   }

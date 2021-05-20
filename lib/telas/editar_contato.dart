@@ -1,3 +1,4 @@
+import 'package:agenda_de_contatos/models/contato.dart';
 import 'package:agenda_de_contatos/providers/contatos.dart';
 import 'package:agenda_de_contatos/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,9 @@ import 'package:via_cep_flutter/via_cep_flutter.dart';
 
 class NovoContato extends StatefulWidget {
   static const routeName = 'telas/novo_contato';
+  final Contato editarContato;
+
+  NovoContato({this.editarContato});
 
   @override
   _NovoContatoState createState() => _NovoContatoState();
@@ -15,7 +19,23 @@ class _NovoContatoState extends State<NovoContato> {
   final _globalKey = GlobalKey<FormState>();
   var _formValues = {};
 
+  bool update = false;
   var _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.editarContato != null) {
+      update = true;
+
+      _formValues['nome'] = widget.editarContato.nome;
+      _formValues['email'] = widget.editarContato.email;
+      _formValues['endereco'] = widget.editarContato.endereco;
+      _formValues['cep'] = widget.editarContato.cep;
+      _formValues['telefone'] = widget.editarContato.telefone;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,11 +157,22 @@ class _NovoContatoState extends State<NovoContato> {
       return '';
     }
 
-    Provider.of<Contatos>(context, listen: false).inserir(
-        _formValues['nome'],
-        _formValues['email'],
-        _formValues['endereco'],
-        _formValues['cep'],
-        _formValues['telefone']);
+    if (!this.update)
+      Provider.of<Contatos>(context, listen: false).inserir(
+          _formValues['nome'],
+          _formValues['email'],
+          _formValues['endereco'],
+          _formValues['cep'],
+          _formValues['telefone']);
+    else
+      Provider.of<Contatos>(context, listen: false).atualizar(
+          widget.editarContato.id,
+          _formValues['nome'],
+          _formValues['email'],
+          _formValues['endereco'],
+          _formValues['cep'],
+          _formValues['telefone']);
+
+    Navigator.of(context).pop();
   }
 }

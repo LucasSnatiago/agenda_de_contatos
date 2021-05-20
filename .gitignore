@@ -1,3 +1,6 @@
+# Chave gpg das credencias do Firebase
+*.gpg
+
 # Miscellaneous
 *.class
 *.lock

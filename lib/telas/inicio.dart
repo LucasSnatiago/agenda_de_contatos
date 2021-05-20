@@ -1,6 +1,6 @@
 import 'package:agenda_de_contatos/models/contato.dart';
 import 'package:agenda_de_contatos/providers/contatos.dart';
-import 'package:agenda_de_contatos/telas/novo_contato.dart';
+import 'package:agenda_de_contatos/telas/editar_contato.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -38,6 +38,7 @@ class _InicioState extends State<Inicio> {
       scrollDirection: Axis.vertical,
       itemCount: contato.length,
       itemBuilder: (context, index) => ListTile(
+        onTap: () => Navigator.of(context).pushNamed(NovoContato.routeName),
         leading: CircleAvatar(),
         title: Text(contato[index].nome),
       ),

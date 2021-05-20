@@ -1,5 +1,5 @@
 import 'package:agenda_de_contatos/providers/contatos.dart';
-import 'package:agenda_de_contatos/telas/novo_contato.dart';
+import 'package:agenda_de_contatos/telas/editar_contato.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
