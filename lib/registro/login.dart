@@ -1,6 +1,9 @@
+import 'package:agenda_de_contatos/providers/auth.dart';
 import 'package:agenda_de_contatos/registro/registrar.dart';
+import 'package:agenda_de_contatos/telas/inicio.dart';
 import 'package:agenda_de_contatos/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
   static const routeName = 'registro/login';
@@ -60,7 +63,8 @@ class _LoginState extends State<Login> {
                   height: 5,
                 ),
                 ElevatedButton(
-                    onPressed: () => entrar(), child: Text('Entrar na conta')),
+                    onPressed: () => entrar(context),
+                    child: Text('Entrar na conta')),
                 ElevatedButton(
                     onPressed: () =>
                         Navigator.of(context).pushNamed(Registrar.routeName),
@@ -73,9 +77,16 @@ class _LoginState extends State<Login> {
     );
   }
 
-  entrar() {
+  entrar(context) async {
     _globalKey.currentState.save();
 
     if (!_globalKey.currentState.validate()) return;
+
+    bool sucessoLogin = await Provider.of<Auth>(context, listen: false)
+        .logar(_formValues['email'], _formValues['senha']);
+
+    if (!sucessoLogin)
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Não foi possível fazer o login!')));
   }
 }

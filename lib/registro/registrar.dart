@@ -85,7 +85,7 @@ class _RegistrarState extends State<Registrar> {
                         ? 'A senha precisa ter no mínimo 8 caracteres'
                         : null,
                     decoration: InputDecoration(
-                        labelText: 'Condirmar senha',
+                        labelText: 'Confirmar senha',
                         border: OutlineInputBorder()),
                   ),
                   SizedBox(
