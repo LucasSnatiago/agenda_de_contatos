@@ -27,7 +27,9 @@ class _NovoContatoState extends State<NovoContato> {
     super.initState();
 
     if (widget.editarContato != null) {
-      update = true;
+      this.update = true;
+
+      _controller.text = widget.editarContato.endereco;
 
       _formValues['nome'] = widget.editarContato.nome;
       _formValues['email'] = widget.editarContato.email;
@@ -51,17 +53,20 @@ class _NovoContatoState extends State<NovoContato> {
               child: Column(
                 children: [
                   Text(
-                    'Entre com os dados do contato',
+                    this.update
+                        ? 'Edite seu contato'
+                        : 'Entre com os dados do contato',
                     style: TextStyle(fontSize: 20),
                   ),
                   SizedBox(
                     height: 25.0,
                   ),
                   TextFormField(
+                    initialValue: _formValues['nome'],
                     autocorrect: true,
                     keyboardType: TextInputType.name,
                     validator: (value) =>
-                        value.isEmpty ? 'O nome não pode ser vazio!' : '',
+                        value.isEmpty ? 'O nome não pode ser vazio!' : null,
                     onSaved: (nome) => _formValues['nome'] = nome,
                     decoration: InputDecoration(
                         labelText: 'Nome', border: OutlineInputBorder()),
@@ -70,11 +75,12 @@ class _NovoContatoState extends State<NovoContato> {
                     height: 2.0,
                   ),
                   TextFormField(
+                    initialValue: _formValues['email'],
                     autocorrect: false,
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) => !isValidEmail(value)
                         ? 'É necessário inserir um email válido'
-                        : '',
+                        : null,
                     onSaved: (email) => _formValues['email'] = email,
                     decoration: InputDecoration(
                         labelText: 'Email', border: OutlineInputBorder()),
@@ -83,11 +89,12 @@ class _NovoContatoState extends State<NovoContato> {
                     height: 2.0,
                   ),
                   TextFormField(
+                    initialValue: _formValues['telefone'],
                     autocorrect: false,
                     keyboardType: TextInputType.phone,
                     validator: (value) => value.isEmpty
                         ? 'O número de telefone não pode ser vazio!'
-                        : '',
+                        : null,
                     onSaved: (telefone) => _formValues['telefone'] = telefone,
                     decoration: InputDecoration(
                         labelText: 'Telefone', border: OutlineInputBorder()),
@@ -96,11 +103,12 @@ class _NovoContatoState extends State<NovoContato> {
                     height: 2.0,
                   ),
                   TextFormField(
+                    initialValue: _formValues['cep'],
                     autocorrect: false,
                     keyboardType: TextInputType.number,
                     maxLength: 8,
                     validator: (value) =>
-                        value.isEmpty ? 'O CEP não pode estar vazio!' : '',
+                        value.isEmpty ? 'O CEP não pode estar vazio!' : null,
                     onSaved: (cep) => _formValues['cep'] = cep,
                     decoration: InputDecoration(
                         labelText: 'CEP', border: OutlineInputBorder()),
@@ -109,9 +117,10 @@ class _NovoContatoState extends State<NovoContato> {
                     height: 2.0,
                   ),
                   TextFormField(
+                    controller: _controller,
                     autocorrect: true,
                     validator: (value) =>
-                        value.isEmpty ? 'O endereço não pode ser vazio!' : '',
+                        value.isEmpty ? 'O endereço não pode ser vazio!' : null,
                     onSaved: (endereco) => _formValues['endereco'] = endereco,
                     decoration: InputDecoration(
                         labelText: 'Endereço', border: OutlineInputBorder()),
@@ -150,22 +159,22 @@ class _NovoContatoState extends State<NovoContato> {
     return result.street;
   }
 
-  addContato() {
+  addContato() async {
     _globalKey.currentState.save();
 
-    if (_globalKey.currentState.validate()) {
+    if (!_globalKey.currentState.validate()) {
       return '';
     }
 
     if (!this.update)
-      Provider.of<Contatos>(context, listen: false).inserir(
+      await Provider.of<Contatos>(context, listen: false).inserir(
           _formValues['nome'],
           _formValues['email'],
           _formValues['endereco'],
           _formValues['cep'],
           _formValues['telefone']);
     else
-      Provider.of<Contatos>(context, listen: false).atualizar(
+      await Provider.of<Contatos>(context, listen: false).atualizar(
           widget.editarContato.id,
           _formValues['nome'],
           _formValues['email'],

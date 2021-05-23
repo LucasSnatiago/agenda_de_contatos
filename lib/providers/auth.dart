@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 
 class Auth with ChangeNotifier {
   FirebaseAuth _fauth = FirebaseAuth.instance;
-  final _nomeColecoes = 'usuarios';
+  final _colecaoNome = 'usuarios';
 
   String _id, _nome, _email;
   bool _estaLogado = false;
@@ -17,7 +17,7 @@ class Auth with ChangeNotifier {
   // Pegar dados de um usuário a partir de seu ID.
   Future<DocumentSnapshot> getFireStoreUserData(String userID) async =>
       await FirebaseFirestore.instance
-          .collection(this._nomeColecoes)
+          .collection(this._colecaoNome)
           .doc(userID)
           .get();
 
@@ -53,9 +53,9 @@ class Auth with ChangeNotifier {
     if (user == null) return false;
 
     await FirebaseFirestore.instance
-        .collection(this._nomeColecoes)
+        .collection(this._colecaoNome)
         .doc(user.uid)
-        .set({'nome': this._nome, 'email': this._email});
+        .set({'nome': nome, 'email': email});
 
     this._nome = nome;
     this._email = email;
@@ -72,7 +72,7 @@ class Auth with ChangeNotifier {
     final user = this._fauth.currentUser;
 
     if (user == null) return false;
-    if (this._estaLogado) {
+    if (!this._estaLogado) {
       final firebaseData = await getFireStoreUserData(user.uid);
       final userData = firebaseData.data() as Map<String, dynamic>;
 

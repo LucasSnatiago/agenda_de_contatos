@@ -1,5 +1,7 @@
+import 'package:agenda_de_contatos/providers/auth.dart';
 import 'package:agenda_de_contatos/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Registrar extends StatefulWidget {
   static const routeName = 'registro/registrar';
@@ -101,7 +103,7 @@ class _RegistrarState extends State<Registrar> {
     );
   }
 
-  registrar(context) {
+  registrar(context) async {
     _globalKey.currentState.save();
 
     if (!_globalKey.currentState.validate()) return;
@@ -111,6 +113,9 @@ class _RegistrarState extends State<Registrar> {
       return;
     }
 
-    print(_formValues);
+    await Provider.of<Auth>(context, listen: false).registrar(
+        _formValues['email'], _formValues['nome'], _formValues['senha']);
+
+    Navigator.of(context).pop();
   }
 }

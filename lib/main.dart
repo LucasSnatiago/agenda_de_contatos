@@ -23,8 +23,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(providers: [
-      ChangeNotifierProvider.value(value: Contatos()),
-      ChangeNotifierProvider.value(value: Auth())
+      ChangeNotifierProvider.value(value: Auth()),
+      ChangeNotifierProxyProvider<Auth, Contatos>(
+        create: (context) => Contatos(),
+        update: (context, value, previous) => Contatos.id(value.id),
+      ),
     ], child: BuildMaterialApp());
   }
 }

@@ -1,6 +1,7 @@
 import 'package:agenda_de_contatos/models/contato.dart';
 import 'package:agenda_de_contatos/providers/contatos.dart';
 import 'package:agenda_de_contatos/telas/editar_contato.dart';
+import 'package:agenda_de_contatos/telas/procurar_contato.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,13 +18,31 @@ class _InicioState extends State<Inicio> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Agenda de Contatos'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.search,
+            ),
+            onPressed: () =>
+                showSearch(context: context, delegate: ProcurarContato()),
+          )
+        ],
       ),
-      body: Consumer<Contatos>(
-        builder: (context, contatos, _) => contatos.itens.length == 0
+      body: FutureBuilder(
+        future: Provider.of<Contatos>(context, listen: false)
+            .pegarContatosUsuarioFirebase(),
+        builder: (context, snapshot) => snapshot.connectionState ==
+                ConnectionState.waiting
             ? Center(
-                child: Text('Você não possui nenhum contato!'),
+                child: CircularProgressIndicator(),
               )
-            : _buildListaContatos(context, contatos.itens),
+            : Consumer<Contatos>(
+                builder: (context, contatos, _) => contatos.itens.length == 0
+                    ? Center(
+                        child: Text('Você não possui nenhum contato!'),
+                      )
+                    : _buildListaContatos(context, contatos.itens),
+              ),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
@@ -38,7 +57,19 @@ class _InicioState extends State<Inicio> {
       scrollDirection: Axis.vertical,
       itemCount: contato.length,
       itemBuilder: (context, index) => ListTile(
-        onTap: () => Navigator.of(context).pushNamed(NovoContato.routeName),
+        trailing: GestureDetector(
+          onTap: () async => Provider.of<Contatos>(context, listen: false)
+              .excluir(contato[index].id),
+          child: Icon(
+            Icons.delete,
+            color: Colors.red,
+          ),
+        ),
+        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+          builder: (context) => NovoContato(
+            editarContato: contato[index],
+          ),
+        )),
         leading: CircleAvatar(),
         title: Text(contato[index].nome),
       ),
