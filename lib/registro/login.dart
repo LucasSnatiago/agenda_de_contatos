@@ -1,6 +1,5 @@
 import 'package:agenda_de_contatos/providers/auth.dart';
 import 'package:agenda_de_contatos/registro/registrar.dart';
-import 'package:agenda_de_contatos/telas/inicio.dart';
 import 'package:agenda_de_contatos/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

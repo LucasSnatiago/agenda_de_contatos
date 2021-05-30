@@ -1,7 +1,6 @@
 import 'package:agenda_de_contatos/models/contato.dart';
 import 'package:agenda_de_contatos/providers/contatos.dart';
 import 'package:agenda_de_contatos/telas/editar_contato.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
