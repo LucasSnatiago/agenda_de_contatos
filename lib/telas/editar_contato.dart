@@ -20,7 +20,8 @@ class _NovoContatoState extends State<NovoContato> {
   var _formValues = {};
 
   bool update = false;
-  var _controller = TextEditingController();
+  var _cepController = TextEditingController();
+  var _ruaController = TextEditingController();
 
   @override
   void initState() {
@@ -29,14 +30,22 @@ class _NovoContatoState extends State<NovoContato> {
     if (widget.editarContato != null) {
       this.update = true;
 
-      _controller.text = widget.editarContato.endereco;
+      this._cepController.text = widget.editarContato.cep;
 
-      _formValues['nome'] = widget.editarContato.nome;
-      _formValues['email'] = widget.editarContato.email;
-      _formValues['endereco'] = widget.editarContato.endereco;
-      _formValues['cep'] = widget.editarContato.cep;
-      _formValues['telefone'] = widget.editarContato.telefone;
+      this._formValues['nome'] = widget.editarContato.nome;
+      this._formValues['email'] = widget.editarContato.email;
+      this._formValues['endereco'] = widget.editarContato.endereco;
+      this._formValues['cep'] = widget.editarContato.cep;
+      this._formValues['telefone'] = widget.editarContato.telefone;
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    this._cepController.dispose();
+    this._ruaController.dispose();
   }
 
   @override
@@ -103,7 +112,7 @@ class _NovoContatoState extends State<NovoContato> {
                     height: 2.0,
                   ),
                   TextFormField(
-                    initialValue: _formValues['cep'],
+                    controller: this._cepController,
                     autocorrect: false,
                     keyboardType: TextInputType.number,
                     maxLength: 8,
@@ -116,8 +125,33 @@ class _NovoContatoState extends State<NovoContato> {
                   SizedBox(
                     height: 2.0,
                   ),
+                  ElevatedButton(
+                      onPressed: () async {
+                        var endereco =
+                            await getEnderecoByCep(this._cepController.text);
+                        setState(() {
+                          this._ruaController.text = endereco['street'];
+                          _formValues['endereco'] = endereco['street'] +
+                              ', ' +
+                              endereco['neighborhood'] +
+                              ', ' +
+                              endereco['city'] +
+                              ', ' +
+                              endereco['state'];
+                        });
+                      },
+                      child: Text('Verificar CEP')),
                   TextFormField(
-                    controller: _controller,
+                    controller: this._ruaController,
+                    enabled: false,
+                    decoration: InputDecoration(
+                        labelText: 'Nome da rua', border: OutlineInputBorder()),
+                  ),
+                  SizedBox(
+                    height: 2.0,
+                  ),
+                  TextFormField(
+                    initialValue: this._formValues['endereco'],
                     autocorrect: true,
                     validator: (value) =>
                         value.isEmpty ? 'O endereço não pode ser vazio!' : null,
@@ -125,23 +159,9 @@ class _NovoContatoState extends State<NovoContato> {
                     decoration: InputDecoration(
                         labelText: 'Endereço', border: OutlineInputBorder()),
                   ),
-                  // ElevatedButton(
-                  //     onPressed: () {
-                  //       print(getNomeRua('05653-070'));
-                  //     },
-                  //     child: Text('Verificar CEP')),
-                  // SizedBox(
-                  //   height: 2.0,
-                  // ),
-                  // TextFormField(
-                  //   controller: _controller,
-                  //   readOnly: true,
-                  //   decoration: InputDecoration(
-                  //       labelText: 'Rua', border: OutlineInputBorder()),
-                  // ),
-                  // SizedBox(
-                  //   height: 40,
-                  // ),
+                  SizedBox(
+                    height: 40,
+                  ),
                   ElevatedButton(
                     onPressed: () => addContato(),
                     child: Text('Salvar Contato'),
@@ -153,10 +173,14 @@ class _NovoContatoState extends State<NovoContato> {
     );
   }
 
-  Future<String> getNomeRua(String cep) async {
+  Future<Map<String, dynamic>> getEnderecoByCep(String cep) async {
     if (cep == null || cep.length < 8) return null;
     final result = await readAddressByCep(cep);
-    return result.street;
+    if (result.isEmpty)
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao encontrar endereço pelo CEP')));
+
+    return result;
   }
 
   addContato() async {
