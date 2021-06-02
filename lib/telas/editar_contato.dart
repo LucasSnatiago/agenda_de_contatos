@@ -52,7 +52,8 @@ class _NovoContatoState extends State<NovoContato> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Criar novo Contato'),
+        title:
+            this.update ? Text('Editar Contato') : Text('Criar novo Contato'),
       ),
       body: SingleChildScrollView(
         child: Form(

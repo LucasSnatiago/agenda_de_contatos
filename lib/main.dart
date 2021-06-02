@@ -1,3 +1,4 @@
+import 'package:agenda_de_contatos/camera/camera.dart';
 import 'package:agenda_de_contatos/providers/auth.dart';
 import 'package:agenda_de_contatos/providers/contatos.dart';
 import 'package:agenda_de_contatos/registro/login.dart';
