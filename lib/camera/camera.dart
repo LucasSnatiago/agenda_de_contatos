@@ -56,7 +56,7 @@ class _LigarCameraState extends State<LigarCamera> {
   ImageProvider _buildCircleAvatarImage() {
     if (this.file != null)
       return FileImage(this.file);
-    else if (widget.previewImgUrl != null)
+    else if (widget.previewImgUrl != null && widget.previewImgUrl != '')
       return NetworkImage(widget.previewImgUrl);
     return null;
   }

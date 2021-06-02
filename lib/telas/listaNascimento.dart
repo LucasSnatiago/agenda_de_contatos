@@ -37,15 +37,18 @@ class ListaAniversariantes extends StatelessWidget {
         ));
   }
 
-  Widget _buildListaContatos(context, List<Contato> contato) {
-    return GroupedListView<Contato, DateTime>(
-      shrinkWrap: true,
+  Widget _buildListaContatos(BuildContext context, List<Contato> contato) {
+    return GroupedListView<Contato, int>(
       scrollDirection: Axis.vertical,
+      shrinkWrap: true,
       elements: contato,
-      groupBy: (element) => DateTime.parse(element.aniversario),
-      groupSeparatorBuilder: (value) => Text(mesesAno[value.month - 1]),
-      groupComparator: (value1, value2) => value1.month.compareTo(value2.month),
-      itemBuilder: (context, cont) => _buildContact(context, cont),
+      groupBy: (element) => DateTime.parse(element.aniversario).month,
+      groupSeparatorBuilder: (group_by_value) =>
+          Text(mesesAno[group_by_value - 1]),
+      itemBuilder: (context, element) => _buildContact(context, element),
+      groupComparator: (item1, item2) => item1.compareTo(item2),
+      useStickyGroupSeparators: true,
+      floatingHeader: true,
     );
   }
 
@@ -57,10 +60,17 @@ class ListaAniversariantes extends StatelessWidget {
           color: Colors.red,
         ),
       ),
-      leading: _buildUserPhoto(),
+      leading: _buildUserPhoto(cont),
       title: Text(cont.nome),
     );
   }
 
-  CircleAvatar _buildUserPhoto() => CircleAvatar();
+  CircleAvatar _buildUserPhoto(Contato contato) {
+    if (contato.photo != '')
+      return CircleAvatar(
+        backgroundImage: NetworkImage(contato.photo),
+      );
+    else
+      return CircleAvatar();
+  }
 }

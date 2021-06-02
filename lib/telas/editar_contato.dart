@@ -38,6 +38,7 @@ class _NovoContatoState extends State<NovoContato> {
       this.update = true;
 
       this._cepController.text = widget.editarContato.cep;
+      this._ruaController.text = widget.editarContato.endereco;
 
       this._formValues['nome'] = widget.editarContato.nome;
       this._formValues['email'] = widget.editarContato.email;
@@ -138,7 +139,7 @@ class _NovoContatoState extends State<NovoContato> {
                     children: [
                       ElevatedButton(
                           onPressed: () => _selectDate(context),
-                          child: Text('Selecione o dia de pagamento')),
+                          child: Text('Selecione o dia de aniversário')),
                       Text(DateFormat('dd/MM/yyyy').format(this.aniversario)),
                     ],
                   ),
@@ -235,7 +236,8 @@ class _NovoContatoState extends State<NovoContato> {
       return '';
     }
 
-    print('AAAAAAAAAAAAAAAAAAAAAAAAA' + widget.editarContato.id);
+    if (widget.editarContato != null)
+      print('AAAAAAAAAAAAAAAAAAAAAAAAA' + widget.editarContato.id);
 
     if (!this.update)
       await Provider.of<Contatos>(context, listen: false).inserir(
