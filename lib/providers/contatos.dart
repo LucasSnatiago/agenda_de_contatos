@@ -31,7 +31,7 @@ class Contatos with ChangeNotifier {
     // Adicionando novo elemento na lista do provider
     String id = DateTime.now().toIso8601String();
 
-    if (photo.existsSync()) {
+    if (photo != null && photo.existsSync()) {
       final imgPointer = this
           ._firestorage
           .ref()
@@ -44,6 +44,8 @@ class Contatos with ChangeNotifier {
 
     Contato tmp =
         Contato(id, nome, email, endereco, cep, telefone, url, aniversario);
+
+    print(tmp.id);
 
     this._contatos.add(tmp);
 
@@ -68,7 +70,7 @@ class Contatos with ChangeNotifier {
     // Atualizando a foto na nuvem
     var url = '';
 
-    if (photo.existsSync()) {
+    if (photo != null && photo.existsSync()) {
       final imgPointer = this
           ._firestorage
           .ref()
@@ -83,12 +85,14 @@ class Contatos with ChangeNotifier {
     Contato cont =
         Contato(id, nome, email, endereco, cep, telefone, url, aniversario);
 
+    print(cont.id);
+
     await this
         ._firestore
         .collection(this._colecaoNome)
         .doc(this._id)
         .collection(this._colecaoContatos)
-        .doc(id)
+        .doc(cont.id)
         .update(cont.toMap);
 
     this._contatos[contPos] = cont;

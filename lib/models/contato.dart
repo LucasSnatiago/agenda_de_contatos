@@ -29,6 +29,7 @@ class Contato with ChangeNotifier {
   String get aniversario => this._aniversario;
 
   Map<String, dynamic> get toMap => {
+        'id': this._id,
         'nome': this._nome,
         'email': this._email,
         'endereco': this._endereco,

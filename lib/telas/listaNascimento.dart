@@ -57,8 +57,10 @@ class ListaAniversariantes extends StatelessWidget {
           color: Colors.red,
         ),
       ),
-      leading: CircleAvatar(),
+      leading: _buildUserPhoto(),
       title: Text(cont.nome),
     );
   }
+
+  CircleAvatar _buildUserPhoto() => CircleAvatar();
 }

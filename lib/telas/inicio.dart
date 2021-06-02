@@ -1,8 +1,10 @@
 import 'package:agenda_de_contatos/models/contato.dart';
+import 'package:agenda_de_contatos/providers/auth.dart';
 import 'package:agenda_de_contatos/providers/contatos.dart';
 import 'package:agenda_de_contatos/telas/editar_contato.dart';
 import 'package:agenda_de_contatos/telas/listaNascimento.dart';
 import 'package:agenda_de_contatos/telas/procurar_contato.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -37,6 +39,10 @@ class _InicioState extends State<Inicio> {
               title: Text('Aniversariantes'),
               onTap: () => Navigator.of(context)
                   .pushNamed(ListaAniversariantes.routeName),
+            ),
+            ListTile(
+              title: Text('Sair da conta'),
+              onTap: () async => await Provider.of<Auth>(context).deslogar(),
             ),
           ],
         ),
@@ -83,9 +89,18 @@ class _InicioState extends State<Inicio> {
             editarContato: contato[index],
           ),
         )),
-        leading: CircleAvatar(),
+        leading: _buildUserPhoto(contato, index),
         title: Text(contato[index].nome),
       ),
     );
+  }
+
+  CircleAvatar _buildUserPhoto(List<Contato> contato, int index) {
+    if (contato[index].photo != '')
+      return CircleAvatar(
+        backgroundImage: NetworkImage(contato[index].photo),
+      );
+    else
+      return CircleAvatar();
   }
 }

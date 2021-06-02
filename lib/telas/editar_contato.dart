@@ -27,6 +27,9 @@ class _NovoContatoState extends State<NovoContato> {
   var _cepController = TextEditingController();
   var _ruaController = TextEditingController();
 
+  DateTime aniversario;
+  File fotoUsuario;
+
   @override
   void initState() {
     super.initState();
@@ -42,8 +45,13 @@ class _NovoContatoState extends State<NovoContato> {
       this._formValues['cep'] = widget.editarContato.cep;
       this._formValues['telefone'] = widget.editarContato.telefone;
       this._formValues['photoUrl'] = widget.editarContato.photo;
-      this._formValues['aniversario'] = widget.editarContato.aniversario;
-    }
+
+      if (DateTime.tryParse(widget.editarContato.aniversario) != null)
+        this.aniversario = DateTime.parse(widget.editarContato.aniversario);
+      else
+        this.aniversario = DateTime.now();
+    } else
+      this.aniversario = DateTime.now();
   }
 
   @override
@@ -131,8 +139,7 @@ class _NovoContatoState extends State<NovoContato> {
                       ElevatedButton(
                           onPressed: () => _selectDate(context),
                           child: Text('Selecione o dia de pagamento')),
-                      Text(DateFormat('dd/MM/yyyy')
-                          .format(DateTime.parse(_formValues['aniversario']))),
+                      Text(DateFormat('dd/MM/yyyy').format(this.aniversario)),
                     ],
                   ),
                   SizedBox(
@@ -157,7 +164,6 @@ class _NovoContatoState extends State<NovoContato> {
                         var endereco =
                             await getEnderecoByCep(this._cepController.text);
                         setState(() {
-                          this._ruaController.text = endereco['street'];
                           _formValues['endereco'] = endereco['street'] +
                               ', ' +
                               endereco['neighborhood'] +
@@ -165,24 +171,17 @@ class _NovoContatoState extends State<NovoContato> {
                               endereco['city'] +
                               ', ' +
                               endereco['state'];
+                          this._ruaController.text = _formValues['endereco'];
                         });
                       },
                       child: Text('Verificar CEP')),
                   TextFormField(
                     controller: this._ruaController,
-                    enabled: false,
-                    decoration: InputDecoration(
-                        labelText: 'Nome da rua', border: OutlineInputBorder()),
-                  ),
-                  SizedBox(
-                    height: 2.0,
-                  ),
-                  TextFormField(
-                    initialValue: this._formValues['endereco'],
                     autocorrect: true,
+                    enabled: false,
+                    maxLines: 3,
                     validator: (value) =>
                         value.isEmpty ? 'O endereço não pode ser vazio!' : null,
-                    onSaved: (endereco) => _formValues['endereco'] = endereco,
                     decoration: InputDecoration(
                         labelText: 'Endereço', border: OutlineInputBorder()),
                   ),
@@ -211,7 +210,7 @@ class _NovoContatoState extends State<NovoContato> {
   }
 
   _setPhotoUrl(File fotoPerfil) {
-    this._formValues['photoUrl'] = fotoPerfil;
+    this.fotoUsuario = fotoPerfil;
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -223,10 +222,9 @@ class _NovoContatoState extends State<NovoContato> {
         firstDate: now,
         lastDate: DateTime(now.year + 100),
         initialDate: now);
-    if (picked != null &&
-        picked.toIso8601String() != _formValues['aniversario'])
+    if (picked != null && picked != this.aniversario)
       setState(() {
-        _formValues['aniversario'] = picked.toIso8601String();
+        this.aniversario = picked;
       });
   }
 
@@ -237,27 +235,27 @@ class _NovoContatoState extends State<NovoContato> {
       return '';
     }
 
+    print('AAAAAAAAAAAAAAAAAAAAAAAAA' + widget.editarContato.id);
+
     if (!this.update)
       await Provider.of<Contatos>(context, listen: false).inserir(
-        _formValues['nome'],
-        _formValues['email'],
-        _formValues['endereco'],
-        _formValues['cep'],
-        _formValues['telefone'],
-        _formValues['photoUrl'],
-        _formValues['aniversario'],
-      );
+          _formValues['nome'],
+          _formValues['email'],
+          this._ruaController.text,
+          _formValues['cep'],
+          _formValues['telefone'],
+          this.fotoUsuario,
+          this.aniversario.toIso8601String());
     else
       await Provider.of<Contatos>(context, listen: false).atualizar(
-        widget.editarContato.id,
-        _formValues['nome'],
-        _formValues['email'],
-        _formValues['endereco'],
-        _formValues['cep'],
-        _formValues['telefone'],
-        _formValues['photoUrl'],
-        _formValues['aniversario'],
-      );
+          widget.editarContato.id,
+          _formValues['nome'],
+          _formValues['email'],
+          this._ruaController.text,
+          _formValues['cep'],
+          _formValues['telefone'],
+          this.fotoUsuario,
+          this.aniversario.toIso8601String());
 
     Navigator.of(context).pop();
   }
