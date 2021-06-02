@@ -1,11 +1,16 @@
+import 'dart:io';
+
 import 'package:agenda_de_contatos/models/contato.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class Contatos with ChangeNotifier {
   final _firestore = FirebaseFirestore.instance;
+  final _firestorage = FirebaseStorage.instance;
   final _colecaoNome = 'usuarios';
   final _colecaoContatos = 'contatos';
+  final _colecaoImgContatos = 'fotosPerfil';
 
   List<Contato> _contatos = [];
   String _id;
@@ -19,11 +24,26 @@ class Contatos with ChangeNotifier {
       this._contatos.firstWhere((element) => element.telefone == t);
 
   Future<void> inserir(String nome, String email, String endereco, String cep,
-      String telefone) async {
-    // Adicionando novo elemento na lista do provider
+      String telefone, File photo, String aniversario) async {
+    // Salvando a foto na nuvem
+    var url = '';
 
+    // Adicionando novo elemento na lista do provider
     String id = DateTime.now().toIso8601String();
-    Contato tmp = Contato(id, nome, email, endereco, cep, telefone);
+
+    if (photo.existsSync()) {
+      final imgPointer = this
+          ._firestorage
+          .ref()
+          .child(this._colecaoImgContatos)
+          .child(this._id + id + '.jpg');
+
+      await imgPointer.putFile(photo);
+      url = await imgPointer.getDownloadURL();
+    }
+
+    Contato tmp =
+        Contato(id, nome, email, endereco, cep, telefone, url, aniversario);
 
     this._contatos.add(tmp);
 
@@ -40,12 +60,28 @@ class Contatos with ChangeNotifier {
   }
 
   Future<void> atualizar(String id, String nome, String email, String endereco,
-      String cep, String telefone) async {
-    Contato cont = Contato(id, nome, email, endereco, cep, telefone);
-
+      String cep, String telefone, File photo, String aniversario) async {
+    // Atualizando contato
     int contPos = this._contatos.indexWhere((element) => element.id == id);
     if (contPos == -1) return; // Elemento não foi encontrado
-    // Atualizando contato
+
+    // Atualizando a foto na nuvem
+    var url = '';
+
+    if (photo.existsSync()) {
+      final imgPointer = this
+          ._firestorage
+          .ref()
+          .child(this._colecaoImgContatos)
+          .child(this._id + id + '.jpg');
+
+      await imgPointer.putFile(photo);
+      url = await imgPointer.getDownloadURL();
+    } else
+      url = this._contatos[contPos].photo;
+
+    Contato cont =
+        Contato(id, nome, email, endereco, cep, telefone, url, aniversario);
 
     await this
         ._firestore
@@ -63,7 +99,7 @@ class Contatos with ChangeNotifier {
 
   // Excluir
   Future<void> excluir(String id) async {
-    this._contatos.removeWhere((element) => element.id == id);
+    int contatoIndex = this._contatos.indexWhere((element) => element.id == id);
 
     await this
         ._firestore
@@ -72,6 +108,14 @@ class Contatos with ChangeNotifier {
         .collection(this._colecaoContatos)
         .doc(id)
         .delete();
+
+    if (Uri.tryParse(this._contatos[contatoIndex].photo) != null)
+      await this
+          ._firestorage
+          .ref()
+          .child(this._colecaoImgContatos)
+          .child(this._id + id + '.jpg')
+          .delete();
 
     // Alertando para remoção
     notifyListeners();
@@ -89,18 +133,14 @@ class Contatos with ChangeNotifier {
     if (listaDocumentos.length == 0) return;
 
     this._contatos = listaDocumentos.map((e) {
-      Map<String, dynamic> dadosContato = e.data();
-
-      return Contato(
-        e.id,
-        dadosContato['nome'],
-        dadosContato['email'],
-        dadosContato['endereco'],
-        dadosContato['cep'],
-        dadosContato['telefone'],
-      );
+      return Contato.fromMap(e.data());
     }).toList();
 
     notifyListeners();
   }
+
+  List<Contato> get aniversariantes => this
+      ._contatos
+      .where((element) => DateTime.tryParse(element.aniversario) != null)
+      .toList();
 }

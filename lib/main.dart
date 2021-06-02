@@ -1,4 +1,4 @@
-import 'package:agenda_de_contatos/camera/camera.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:agenda_de_contatos/providers/auth.dart';
 import 'package:agenda_de_contatos/providers/contatos.dart';
 import 'package:agenda_de_contatos/registro/login.dart';
@@ -42,6 +42,8 @@ class BuildMaterialApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Agenda de Contatos',
+      localizationsDelegates: [GlobalMaterialLocalizations.delegate],
+      supportedLocales: [const Locale('en'), const Locale('pt')],
       home: Consumer<Auth>(
         builder: (context, auth, child) => auth.estaLogado
             ? Inicio()

@@ -1,7 +1,11 @@
+import 'dart:io';
+
+import 'package:agenda_de_contatos/camera/camera.dart';
 import 'package:agenda_de_contatos/models/contato.dart';
 import 'package:agenda_de_contatos/providers/contatos.dart';
 import 'package:agenda_de_contatos/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:via_cep_flutter/via_cep_flutter.dart';
 
@@ -37,6 +41,8 @@ class _NovoContatoState extends State<NovoContato> {
       this._formValues['endereco'] = widget.editarContato.endereco;
       this._formValues['cep'] = widget.editarContato.cep;
       this._formValues['telefone'] = widget.editarContato.telefone;
+      this._formValues['photoUrl'] = widget.editarContato.photo;
+      this._formValues['aniversario'] = widget.editarContato.aniversario;
     }
   }
 
@@ -70,6 +76,13 @@ class _NovoContatoState extends State<NovoContato> {
                   ),
                   SizedBox(
                     height: 25.0,
+                  ),
+                  LigarCamera(
+                    _setPhotoUrl,
+                    previewImgUrl: _formValues['photoUrl'],
+                  ),
+                  SizedBox(
+                    height: 5,
                   ),
                   TextFormField(
                     initialValue: _formValues['nome'],
@@ -111,6 +124,19 @@ class _NovoContatoState extends State<NovoContato> {
                   ),
                   SizedBox(
                     height: 2.0,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                          onPressed: () => _selectDate(context),
+                          child: Text('Selecione o dia de pagamento')),
+                      Text(DateFormat('dd/MM/yyyy')
+                          .format(DateTime.parse(_formValues['aniversario']))),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 2,
                   ),
                   TextFormField(
                     controller: this._cepController,
@@ -184,6 +210,26 @@ class _NovoContatoState extends State<NovoContato> {
     return result;
   }
 
+  _setPhotoUrl(File fotoPerfil) {
+    this._formValues['photoUrl'] = fotoPerfil;
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final now = DateTime.now();
+
+    final DateTime picked = await showDatePicker(
+        locale: const Locale('pt', 'BR'),
+        context: context,
+        firstDate: now,
+        lastDate: DateTime(now.year + 100),
+        initialDate: now);
+    if (picked != null &&
+        picked.toIso8601String() != _formValues['aniversario'])
+      setState(() {
+        _formValues['aniversario'] = picked.toIso8601String();
+      });
+  }
+
   addContato() async {
     _globalKey.currentState.save();
 
@@ -193,19 +239,25 @@ class _NovoContatoState extends State<NovoContato> {
 
     if (!this.update)
       await Provider.of<Contatos>(context, listen: false).inserir(
-          _formValues['nome'],
-          _formValues['email'],
-          _formValues['endereco'],
-          _formValues['cep'],
-          _formValues['telefone']);
+        _formValues['nome'],
+        _formValues['email'],
+        _formValues['endereco'],
+        _formValues['cep'],
+        _formValues['telefone'],
+        _formValues['photoUrl'],
+        _formValues['aniversario'],
+      );
     else
       await Provider.of<Contatos>(context, listen: false).atualizar(
-          widget.editarContato.id,
-          _formValues['nome'],
-          _formValues['email'],
-          _formValues['endereco'],
-          _formValues['cep'],
-          _formValues['telefone']);
+        widget.editarContato.id,
+        _formValues['nome'],
+        _formValues['email'],
+        _formValues['endereco'],
+        _formValues['cep'],
+        _formValues['telefone'],
+        _formValues['photoUrl'],
+        _formValues['aniversario'],
+      );
 
     Navigator.of(context).pop();
   }
