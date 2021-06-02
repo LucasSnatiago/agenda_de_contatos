@@ -1,3 +1,4 @@
+import 'package:agenda_de_contatos/telas/listaNascimento.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:agenda_de_contatos/providers/auth.dart';
 import 'package:agenda_de_contatos/providers/contatos.dart';
@@ -61,6 +62,7 @@ class BuildMaterialApp extends StatelessWidget {
         NovoContato.routeName: (ctx) => NovoContato(),
         Login.routeName: (ctx) => Login(),
         Registrar.routeName: (ctx) => Registrar(),
+        ListaAniversariantes.routeName: (ctx) => ListaAniversariantes(),
       },
     );
   }

@@ -20,6 +20,8 @@ const List<String> mesesAno = const [
 ];
 
 class ListaAniversariantes extends StatelessWidget {
+  static const routeName = 'telas/listaAniversario';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,6 +44,7 @@ class ListaAniversariantes extends StatelessWidget {
       elements: contato,
       groupBy: (element) => DateTime.parse(element.aniversario),
       groupSeparatorBuilder: (value) => Text(mesesAno[value.month - 1]),
+      groupComparator: (value1, value2) => value1.month.compareTo(value2.month),
       itemBuilder: (context, cont) => _buildContact(context, cont),
     );
   }
