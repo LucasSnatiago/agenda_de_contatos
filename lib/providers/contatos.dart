@@ -104,6 +104,7 @@ class Contatos with ChangeNotifier {
   // Excluir
   Future<void> excluir(String id) async {
     int contatoIndex = this._contatos.indexWhere((element) => element.id == id);
+    this._contatos.removeAt(contatoIndex);
 
     await this
         ._firestore
