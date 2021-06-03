@@ -42,7 +42,8 @@ class _InicioState extends State<Inicio> {
             ),
             ListTile(
               title: Text('Sair da conta'),
-              onTap: () async => await Provider.of<Auth>(context).deslogar(),
+              onTap: () async =>
+                  await Provider.of<Auth>(context, listen: false).deslogar(),
             ),
           ],
         ),
