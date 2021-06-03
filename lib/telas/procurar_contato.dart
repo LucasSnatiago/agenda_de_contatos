@@ -138,11 +138,20 @@ class ProcurarContato extends SearchDelegate<Contato> {
               this.selecionado = listSugestoes[index];
               showResults(context);
             },
-            leading: CircleAvatar(),
+            leading: _buildUserPhoto(listSugestoes[index]),
             title: Text(listSugestoes[index].nome),
           ),
         );
       },
     );
+  }
+
+  CircleAvatar _buildUserPhoto(Contato contato) {
+    if (contato.photo != '')
+      return CircleAvatar(
+        backgroundImage: NetworkImage(contato.photo),
+      );
+    else
+      return CircleAvatar();
   }
 }
